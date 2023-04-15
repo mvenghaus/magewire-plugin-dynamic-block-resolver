@@ -94,7 +94,7 @@ class DynamicBlockResolver extends Layout
     private function getBlockData(AbstractBlock $block): array
     {
         $blockData = [];
-        foreach ($blockData as $name => $value) {
+        foreach ($block->getData() as $name => $value) {
             if (is_object($value) ||
                 in_array($name, ['type', 'magewire', 'module_name'])
             ) {
