@@ -1,0 +1,17 @@
+{
+	"name": "mvenghaus/magewire-plugin-dynamic-block-resolver",
+	"description": "Dynamic block resolver",
+	"type": "magento2-module",
+	"require": {
+		"php": "^8.1",
+		"magewirephp/magewire": "^1.9.1"
+	},
+	"autoload": {
+		"files": [
+			"src/registration.php"
+		],
+		"psr-4": {
+			"MVenghaus\\MagewirePluginDynamicBlockResolver\\": "src"
+		}
+	}
+}
