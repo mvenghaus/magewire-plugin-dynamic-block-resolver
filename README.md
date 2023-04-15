@@ -5,7 +5,7 @@ Innately magewire defines the component in the layout xml. But sometimes you wan
 ```
 $block->getLayout()
     ->createBlock(\Magento\Framework\View\Element\Template::class)
-    ->setData('magewire', \Vendor\Module\Magewire\Test')
+    ->setData('magewire', ObjectManager::getInstance()->create(\Vendor\Module\Magewire\Test::class))
     ->toHtml();
 ```
 
