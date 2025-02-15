@@ -57,7 +57,6 @@ class DynamicBlockResolver extends Layout
     public function reconstruct(MagewireRequestInterface $request): Component
     {
         $page = $this->resultPageFactory->create();
-        $page->addHandle(strtolower($request->getFingerprint('handle')))->initLayout();
 
         $dataMeta = $request->getServerMemo('dataMeta');
 
