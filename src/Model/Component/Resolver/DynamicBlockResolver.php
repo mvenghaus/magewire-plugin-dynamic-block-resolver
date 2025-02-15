@@ -73,7 +73,7 @@ class DynamicBlockResolver extends Layout
         $component = $this->objectManager->create($mapping['magewire']);
 
         $block = $page->getLayout()->createBlock($mapping['block'])
-            ->addData($dynamicBlockData)
+            ->addData(is_array($dynamicBlockData) ? $dynamicBlockData : [])
             ->setData('magewire', $component);
 
         return $this->construct($block);
