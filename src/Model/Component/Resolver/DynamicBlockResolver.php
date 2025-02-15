@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace MVenghaus\MagewirePluginDynamicBlockResolver\Model\Component\Resolver;
 
+use _PHPStan_532094bc1\Nette\Neon\Exception;
+use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\Event\ManagerInterface as EventManagerInterface;
 use Magento\Framework\ObjectManagerInterface;
 use Magento\Framework\View\Element\AbstractBlock;
@@ -19,6 +21,7 @@ class DynamicBlockResolver extends Layout
     public function __construct(
         private readonly ObjectManagerInterface $objectManager,
         private readonly Mapping $mapping,
+        private readonly EncryptorInterface $encryptor,
         ResultPageFactory $resultPageFactory,
         EventManagerInterface $eventManager,
         ComponentFactory $componentFactory
@@ -45,7 +48,7 @@ class DynamicBlockResolver extends Layout
 
         $component->setMetaData([
             'dynamic_block_name' => $mappingName,
-            'dynamic_block_data' => $this->getBlockData($block)
+            'dynamic_block_data' => $this->encryptor->encrypt(json_encode($this->getBlockData($block)))
         ]);
 
         return $component;
@@ -58,17 +61,20 @@ class DynamicBlockResolver extends Layout
 
         $dataMeta = $request->getServerMemo('dataMeta');
 
-        $dynamicBlockName = $dataMeta['dynamic_block_name'];
-        $dynamicBlockData = $dataMeta['dynamic_block_data'];
+        $dynamicBlockName = $dataMeta['dynamic_block_name'] ?? '';
+        $dynamicBlockData = json_decode((string) $this->encryptor->decrypt($dataMeta['dynamic_block_data']), true);
 
         $mapping = $this->getMappingByName($dynamicBlockName);
+        if ($mapping === null) {
+            throw new Exception("dynamic block {$dynamicBlockName} not found");
+        }
 
         /** @var Component $component */
         $component = $this->objectManager->create($mapping['magewire']);
 
         $block = $page->getLayout()->createBlock($mapping['block'])
-            ->setData('magewire', $component)
-            ->addData($dynamicBlockData);
+            ->addData($dynamicBlockData)
+            ->setData('magewire', $component);
 
         return $this->construct($block);
     }
